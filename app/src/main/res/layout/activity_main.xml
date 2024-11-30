@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <com.matrix.otpview.OtpView
+        android:id="@+id/otp"
+        android:layout_width="wrap_content"
+        android:layout_marginHorizontal="25dp"
+        app:squareColor="#4DC4BAD1"
+        app:squareHeight="50dp"
+        app:squareWidth="50dp"
+        app:cornerRadius="8dp"
+        app:borderColor="#EE4B00"
+        app:borderWidth="2dp"
+        app:hint=""
+        android:gravity="center"
+        app:squareCount="8"
+        app:highlightColor="@color/black"
+        app:autoSize="true"
+        app:maxCountPerLine="10"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

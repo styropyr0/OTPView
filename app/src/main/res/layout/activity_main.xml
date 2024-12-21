@@ -12,19 +12,21 @@
     <com.matrix.otpview.OtpView
         android:id="@+id/otp"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="25dp"
-        app:squareColor="#4DC4BAD1"
-        app:squareHeight="50dp"
-        app:squareWidth="50dp"
-        app:cornerRadius="8dp"
+        android:gravity="center"
+        app:autoSize="true"
         app:borderColor="#EE4B00"
         app:borderWidth="2dp"
-        app:hint=""
-        android:gravity="center"
-        app:squareCount="8"
+        app:cornerRadius="8dp"
+        app:fontFamily="@font/dm_sans_medium"
         app:highlightColor="@color/black"
-        app:autoSize="true"
-        app:maxCountPerLine="10"
-        android:layout_height="wrap_content"/>
+        app:hint="*"
+        app:maxCountPerLine="6"
+        app:onCompleteBorderColor="#2EDB17"
+        app:squareColor="#4DC4BAD1"
+        app:squareCount="16"
+        app:squareHeight="50dp"
+        app:squareWidth="50dp" />
 
 </LinearLayout>

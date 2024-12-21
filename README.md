@@ -35,14 +35,14 @@ To use **OtpView** in your project, add the following to your `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.github.styropyr0:OtpView:v1.0.0'
+    implementation 'com.github.styropyr0:OTPView:1.0.0'
 }
 ```
 or for `app:build.gradle.kts`
 
 ```kotlin
 dependencies {
-    implementation("com.github.styropyr0:OtpView:v1.0.0")
+    implementation("com.github.styropyr0:OTPView:1.0.0")
 }
 ```
 

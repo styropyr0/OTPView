@@ -3,13 +3,16 @@ package com.matrix.otpview
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.text.Editable
+import android.text.InputFilter
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.matrix.otpview.interfaces.OTPCompletionHandler
@@ -43,12 +46,15 @@ class OtpView @JvmOverloads constructor(
     private var highlightColor: Int = Color.BLUE
     private var editTextShape: Shape = Shape.RECTANGLE
     private var maxCountPerLine: Int = 4
-    private var inputType= InputType.TYPE_CLASS_NUMBER
+    private var inputType = InputType.TYPE_CLASS_NUMBER
+    private var onCompleteBorderColor: Int = Color.GREEN
+    private var borderColorIsSet = false
+    private var onOTPErrorBorderColor = Color.RED
+    private var fontFamily: String? = null
+    private var textStyle: String? = null
     private var otp: String = ""
 
-    public var onTypingComplete = object : OTPCompletionHandler {
-        override fun onComplete() {}
-    }
+    private var completionListener: OTPCompletionHandler? = null
 
     private val paint = Paint().apply {
         style = Paint.Style.STROKE
@@ -77,7 +83,14 @@ class OtpView @JvmOverloads constructor(
                 squareHeight = getDimension(R.styleable.OtpView_squareHeight, 0f)
                 autoSize = getBoolean(R.styleable.OtpView_autoSize, false)
                 highlightColor = getColor(R.styleable.OtpView_highlightColor, Color.BLUE)
-                inputType = if(getString(R.styleable.OtpView_inputType)?.lowercase()=="numeric")InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_NUMBER
+                fontFamily = getString(R.styleable.OtpView_fontFamily)
+                textStyle = getString(R.styleable.OtpView_textStyle)
+                onCompleteBorderColor =
+                    getColor(R.styleable.OtpView_onCompleteBorderColor, Color.GREEN)
+                onOTPErrorBorderColor =
+                    getColor(R.styleable.OtpView_onOTPErrorBorderColor, Color.RED)
+                inputType =
+                    if (getString(R.styleable.OtpView_inputType)?.lowercase() == "numeric") InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_NUMBER
                 val shapeString = getString(R.styleable.OtpView_shape)?.lowercase() ?: "rectangle"
                 editTextShape = when (shapeString) {
                     "circle" -> Shape.CIRCLE
@@ -95,87 +108,105 @@ class OtpView @JvmOverloads constructor(
 
     private fun addEditTexts(start: Int = 0) {
         if (autoSize) {
-            var count = start
-            var itemWidth = 0
-            var isFirstRow = true
-            var totalMargins = 0
             var rowLinearLayout: LinearLayout? = null
             for (i in start until squareCount) {
-                if(i % maxCountPerLine == 0) {
+                if (i % maxCountPerLine == 0) {
                     rowLinearLayout = LinearLayout(context).apply {
                         orientation = HORIZONTAL
                         gravity = Gravity.CENTER_HORIZONTAL
                         layoutParams =
-                            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                            LayoutParams(
+                                LayoutParams.MATCH_PARENT,
+                                LayoutParams.WRAP_CONTENT
+                            )
                     }
                     addView(rowLinearLayout)
                 }
                 val editText = EditText(context).apply {
-                    layoutParams = if(i<maxCountPerLine)LayoutParams(resolveAvailableWidth().toInt(), resolveAvailableHeight().toInt(), 1f).apply {
-                        setMargins(margins, margins, margins, margins)
-                    }else LayoutParams(itemWidth, resolveAvailableHeight().toInt(), 1f).apply {
-                        setMargins(margins, margins, margins, margins)
-                    }
+                    layoutParams =
+                        if (i < squareCount - squareCount % maxCountPerLine) LayoutParams(
+                            resolveAvailableWidth().toInt(),
+                            resolveAvailableHeight().toInt(),
+                            1f
+                        ).apply {
+                            setMargins(margins, margins, margins, margins)
+                        } else LayoutParams(
+                            squareWidth.toInt() - margins*2 - paddingLeft/(squareCount%maxCountPerLine),
+                            resolveAvailableHeight().toInt()
+                        ).apply {
+                            setMargins(margins, margins, margins, margins)
+                        }
+
+                    maxWidth = squareWidth.toInt()
                     gravity = Gravity.CENTER
                     background = createBackgroundDrawable()
                     inputType = this@OtpView.inputType
                     textSize = this@OtpView.textSize
                     setTextColor(textColor)
+                    if (!fontFamily.isNullOrEmpty()) setTypeface(
+                        Typeface.create(
+                            fontFamily,
+                            resolveTextStyle()
+                        )
+                    )
                     hint = this@OtpView.hint
+                    filters = arrayOf(InputFilter.LengthFilter(1))
                     addTextChangedListener(GenericTextWatcher(this, i))
                 }
-                if (i==0) {
-                    val rowWidth = width - paddingLeft - paddingRight
-                    totalMargins = margins * (maxCountPerLine + 1)
-                    val availableWidth = abs(rowWidth - totalMargins)
-                    itemWidth = availableWidth / maxCountPerLine
-                    isFirstRow = false
-                }
-                if(i==maxCountPerLine-1)
-                    itemWidth = rowLinearLayout?.layoutParams?.width!!/maxCountPerLine
-
                 rowLinearLayout?.addView(editText)
 
             }
-        }
-
-        else{
+        } else {
             var currentRow: LinearLayout? = null
-            val containerWidth = width - paddingLeft - paddingRight
-            val totalHorizontalMargins = margins * (maxCountPerLine + 1)
-
-            val itemWidth = if (autoSize) {
-                val availableWidth = containerWidth - totalHorizontalMargins
-                availableWidth / maxCountPerLine
-            } else
-                resolveAvailableWidth()
+            val itemWidth = resolveAvailableWidth()
 
             for (i in start until squareCount) {
                 if (i % maxCountPerLine == 0) {
                     currentRow = LinearLayout(context).apply {
                         orientation = HORIZONTAL
                         gravity = Gravity.CENTER_HORIZONTAL
-                        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                        layoutParams =
+                            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
                     }
                     addView(currentRow)
                 }
 
                 val editText = EditText(context).apply {
-                    layoutParams = LayoutParams(itemWidth.toInt(), resolveAvailableHeight().toInt()).apply {
-                        setMargins(margins, margins, margins, margins)
-                    }
+                    layoutParams =
+                        LayoutParams(itemWidth.toInt(), resolveAvailableHeight().toInt()).apply {
+                            setMargins(margins, margins, margins, margins)
+                        }
                     gravity = Gravity.CENTER
                     background = createBackgroundDrawable()
                     inputType = this@OtpView.inputType
                     maxLines = 1
+                    if (!fontFamily.isNullOrEmpty()) setTypeface(
+                        Typeface.create(
+                            fontFamily,
+                            resolveTextStyle()
+                        )
+                    )
                     textSize = this@OtpView.textSize
                     setTextColor(textColor)
                     hint = this@OtpView.hint
+                    filters = arrayOf(InputFilter.LengthFilter(1))
                     addTextChangedListener(GenericTextWatcher(this, i))
                 }
                 currentRow?.addView(editText)
             }
         }
+    }
+
+    private fun resolveTextStyle(): Int {
+        if (!textStyle.isNullOrEmpty()) {
+            if (textStyle == "bold")
+                return Typeface.BOLD
+            else if (textStyle == "italic")
+                return Typeface.ITALIC
+            else if (textStyle == "bold_italic")
+                return Typeface.BOLD_ITALIC
+        }
+        return Typeface.NORMAL
     }
 
     private fun resolveAvailableWidth() = if (squareWidth > 0f) squareWidth else squareSize
@@ -215,8 +246,14 @@ class OtpView @JvmOverloads constructor(
     private fun updateEditTextsBackground() {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            if (child is EditText) {
-                child.background = createBackgroundDrawable()
+            if (child is LinearLayout) {
+                for (j in 0 until child.childCount) {
+                    val editText = child.getChildAt(j) as? EditText
+                    editText?.apply {
+                        background = createBackgroundDrawable()
+                        setCustomFont(editText)
+                    }
+                }
             }
         }
     }
@@ -224,8 +261,12 @@ class OtpView @JvmOverloads constructor(
     private fun updateEditTextsTextSize() {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            if (child is EditText) {
-                child.textSize = this.textSize
+            if (child is LinearLayout) {
+                for (j in 0 until child.childCount) {
+                    val editText = child.getChildAt(j) as? EditText
+                    editText?.textSize = this.textSize
+                    setCustomFont(editText)
+                }
             }
         }
     }
@@ -233,10 +274,32 @@ class OtpView @JvmOverloads constructor(
     private fun updateEditTextsTextColor() {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
-            if (child is EditText) {
-                child.setTextColor(this.textColor)
+            if (child is LinearLayout) {
+                for (j in 0 until child.childCount) {
+                    val editText = child.getChildAt(j) as? EditText
+                    editText?.setTextColor(this.textColor)
+                    setCustomFont(editText)
+                }
             }
         }
+    }
+
+    private fun setCustomFont(editText: EditText?) {
+        if (editText != null)
+            if (!fontFamily.isNullOrEmpty()) editText.apply {
+                setTypeface(
+                    Typeface.create(
+                        fontFamily,
+                        resolveTextStyle()
+                    )
+                )
+                inputType = this@OtpView.inputType
+            }
+    }
+
+    fun setInputType(inputType: Int) {
+        this.inputType = inputType
+        updateEditTextsTextSize()
     }
 
     fun setSquareCount(squareCount: Int) {
@@ -290,6 +353,33 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    fun setOnCompleteBorderColor(color: Int) {
+        if (this.onCompleteBorderColor != color) {
+            this.onCompleteBorderColor = color
+        }
+    }
+
+    fun setOnOTPErrorBorderColor(color: Int) {
+        if (this.onOTPErrorBorderColor != color) {
+            this.onOTPErrorBorderColor = color
+        }
+    }
+
+    private fun updateOnCompleteBorderColor(color: Int) {
+        val tempColor = borderColor
+        borderColor = color
+        for (i in 0 until childCount) {
+            val child = getChildAt(i)
+            if (child is LinearLayout) {
+                for (j in 0 until child.childCount) {
+                    val editText = child.getChildAt(j) as? EditText
+                    editText?.background = createBackgroundDrawable()
+                }
+            }
+        }
+        borderColor = tempColor
+    }
+
     fun setTextColor(color: Int) {
         if (this.textColor != color) {
             this.textColor = color
@@ -297,27 +387,152 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
-    inner class GenericTextWatcher(private val view: View, private val index: Int) : TextWatcher {
+    fun setOnCompleteListener(listener: OTPCompletionHandler) {
+        this.completionListener = listener
+    }
+
+    private fun shakeAnimation() {
+        val animation = android.view.animation.TranslateAnimation(
+            0f, 20f,
+            0f, 0f
+        ).apply {
+            duration = 50
+            repeatCount = 5
+            repeatMode = android.view.animation.Animation.REVERSE
+        }
+        this.startAnimation(animation)
+    }
+
+    fun onOtpError(clearOtp: Boolean = false) {
+        updateOnCompleteBorderColor(onOTPErrorBorderColor)
+        vibrate()
+        shakeAnimation()
+        if (clearOtp) {
+            clearOtpInput()
+        }
+        borderColorIsSet = true
+    }
+
+    private fun clearOtpInput() {
+        var firstEditText: EditText? = null
+
+        for (i in 0 until childCount) {
+            val child = getChildAt(i)
+            if (child is LinearLayout) {
+                for (j in 0 until child.childCount) {
+                    val editText = child.getChildAt(j) as? EditText
+                    editText?.text?.clear()
+                    if (firstEditText == null) {
+                        firstEditText = editText
+                    }
+                }
+            }
+        }
+        firstEditText?.requestFocus()
+    }
+
+
+    private fun vibrate() {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        if (vibrator != null && vibrator.hasVibrator()) {
+            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+        }
+    }
+
+    inner class GenericTextWatcher(private val currentEditText: EditText, private val index: Int) :
+        TextWatcher {
+
         override fun afterTextChanged(editable: Editable?) {
             val text = editable.toString()
+
+            if (!text.isEmpty()) updateOtp(index, text[0])
+            else clearOtp(index)
+
             if (text.length == 1 && index < squareCount - 1) {
-                val nextEditText = getChildAt((index / maxCountPerLine))?.let { row ->
-                    (row as LinearLayout).getChildAt(index % maxCountPerLine + 1) as? EditText
-                }
+                val nextEditText = getNextEditText(index)
                 nextEditText?.requestFocus()
             } else if (text.isEmpty() && index > 0) {
-                val prevEditText = getChildAt((index / maxCountPerLine))?.let { row ->
-                    (row as LinearLayout).getChildAt(index % maxCountPerLine - 1) as? EditText
-                }
+                val prevEditText = getPreviousEditText(index)
                 prevEditText?.requestFocus()
+            }
+
+            if (isOtpComplete()) {
+                updateOnCompleteBorderColor(onCompleteBorderColor)
+                otp = getOtpFromFields()
+                completionListener?.onComplete(otp)
+                borderColorIsSet = true
+            } else if (borderColorIsSet) {
+                borderColorIsSet = false
+                updateOnCompleteBorderColor(borderColor)
             }
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            onTypingComplete.onComplete()
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+        private fun getNextEditText(index: Int): EditText? {
+            val nextIndex = index + 1
+            val row = nextIndex / maxCountPerLine
+            val col = nextIndex % maxCountPerLine
+
+            val rowLayout = getChildAt(row) as? LinearLayout ?: return null
+            return rowLayout.getChildAt(col) as? EditText
         }
+
+        private fun getPreviousEditText(index: Int): EditText? {
+            val prevIndex = index - 1
+            val row = prevIndex / maxCountPerLine
+            val col = prevIndex % maxCountPerLine
+
+            val rowLayout = getChildAt(row) as? LinearLayout ?: return null
+            return rowLayout.getChildAt(col) as? EditText
+        }
+
+        private fun updateOtp(index: Int, char: Char) {
+            val otpArray = otp.toCharArray()
+            if (otpArray.size > index) {
+                otpArray[index] = char
+            } else {
+                otp = otp.padEnd(index, ' ') + char
+                return
+            }
+            otp =
+                if (inputType != InputType.TYPE_CLASS_TEXT) String(otpArray).trim()
+                else String(otpArray)
+        }
+
+        private fun clearOtp(index: Int) {
+            val otpArray = otp.toCharArray()
+            if (otpArray.size > index) {
+                otpArray[index] = ' '
+            }
+            otp = String(otpArray)
+        }
+
+        private fun isOtpComplete(): Boolean {
+            for (i in 0 until squareCount) {
+                val row = i / maxCountPerLine
+                val col = i % maxCountPerLine
+                val rowLayout = getChildAt(row) as? LinearLayout ?: return false
+                val editText = rowLayout.getChildAt(col) as? EditText ?: return false
+                if (editText.text.isEmpty()) return false
+            }
+            return true
+        }
+
+        private fun getOtpFromFields(): String {
+            val otpBuilder = StringBuilder()
+            for (i in 0 until squareCount) {
+                val row = i / maxCountPerLine
+                val col = i % maxCountPerLine
+                val rowLayout = getChildAt(row) as? LinearLayout ?: continue
+                val editText = rowLayout.getChildAt(col) as? EditText ?: continue
+                otpBuilder.append(editText.text.toString())
+            }
+            return otpBuilder.toString()
+        }
+
     }
 
     enum class Shape {

@@ -1,55 +1,48 @@
-# **OTP View Library**
+# **OtpView Library**
 
-**Latest version: 1.0.0**
+**Latest Version**: 1.0.0
 
-**OTP View** is a customizable, flexible library for implementing an OTP (One-Time Password) input field in Android applications. It allows developers to quickly integrate an OTP input view that is both functional and visually appealing. The library supports various customization options, such as border colors, text sizes, corner radius, and more, to fit different design needs.
+**OtpView** is a customizable OTP (One Time Password) input view for Android. It allows users to enter OTPs in a secure, visually appealing way with full flexibility in terms of appearance and behavior. You can easily customize the number of input squares, square colors, text size, and many other aspects to fit your app's design.
 
 ---
 
-## **Why Use OTP View?**
+## **Why Use OtpView?**
 
 ### **Key Features**:
 
-1. **Customizable Appearance**:  
-   The OTP input view provides numerous styling options, such as square color, corner radius, text size, text color, and border style, allowing for a highly customizable UI that can match your app's theme.
+1. **Customizable UI**:  
+   With multiple customization options like square size, color, and border radius, you can fully adapt the OTP view to your app's design.
 
-2. **Automatic OTP Processing**:  
-   The view includes an option to automatically process the OTP when the user completes entering the characters, reducing the need for additional logic to handle OTP submission.
+2. **Auto-Processing**:  
+   Supports automatic OTP processing once the user completes the input, saving you time and providing a smoother user experience.
 
 3. **Error Handling**:  
-   It provides the ability to customize border colors on successful OTP entry or in case of an error (invalid OTP), helping to visually communicate the status of the OTP input.
+   Handle errors gracefully by highlighting fields with incorrect OTP entries, helping users quickly correct mistakes.
 
-4. **Flexible Layout**:  
-   The OTP input supports flexible square count and layout customization, including the option to auto-size the squares and define the maximum number of squares per line.
+4. **Multi-Line Input**:  
+   Supports a flexible number of input fields and automatic line breaks for a clean layout.
 
-5. **Multi-Type Input**:  
-   The view supports different input types, such as numbers or password input, ensuring the OTP input is secure and appropriate for your app’s requirements.
-
-6. **Text Styling Support**:  
-   The library includes options to specify custom font families and text styles (e.g., bold, italic) for better typography control.
-
-7. **Easy Integration**:  
-   The OTP input view can be easily integrated into any layout and requires minimal setup, with all properties customizable directly from XML.
+5. **Enhanced Security**:  
+   The OTP input is designed to be secure, with options to handle both numeric and text-based inputs.
 
 ---
 
 ## **Installation**
 
-Add the following to your `build.gradle` (app-level):
+To use **OtpView** in your project, add the following to your `build.gradle`:
 
 ### Gradle (App Level)
 
 ```gradle
 dependencies {
-    implementation 'com.github.styropyr0:OTPView:v1.0.0'
+    implementation 'com.github.styropyr0:OtpView:v1.0.0'
 }
 ```
-
 or for `app:build.gradle.kts`
 
 ```kotlin
 dependencies {
-    implementation("com.github.styropyr0:OTPView:v1.0.0")
+    implementation("com.github.styropyr0:OtpView:v1.0.0")
 }
 ```
 
@@ -68,53 +61,43 @@ or for `settings.gradle.kts`
 
 ```kotlin
 dependencyResolutionManagement {
-		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-		repositories {
-			mavenCentral()
-			maven { url = uri("https://jitpack.io") }
-		}
-	}
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
 ```
 
 ---
 
 ## **Getting Started**
 
-### **Step 1: Add the OTP View to Your Layout**
+### **Step 1: Add the OtpView to Your Layout**
 
-Add the `OtpView` widget to your XML layout and customize its attributes. Here's an example (Not all attributes are required):
+To add the `OtpView` to your layout file, use the following XML code:
 
 ```xml
 <com.matrix.otpview.OtpView
     android:id="@+id/otp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="25dp"
-    android:gravity="center"
-    app:autoSize="true"
-    app:borderColor="#779AEB"
-    app:borderWidth="2dp"
-    app:cornerRadius="8dp"
-    app:inputType="number"
-    app:fontFamily="@font/dm_sans_medium"
-    app:highlightColor="#2A5CC1"
-    app:hint="*"
-    app:textStyle="bold"
-    app:textColor="#835EFF"
-    app:maxCountPerLine="8"
-    app:onCompleteBorderColor="#2EDB17"
-    app:squareColor="#871EA0FD"
     app:squareCount="6"
-    app:squareHeight="50dp"
-    app:squareWidth="50dp"
-    app:margins="8dp"
-    app:autoProcess="true"
-    app:shape="square" />
+    app:squareColor="#871EA0FD"
+    app:squareSize="50dp"
+    app:cornerRadius="8dp"
+    app:textSize="16sp"
+    app:textColor="#835EFF"
+    app:highlightColor="#2A5CC1"
+    app:onCompleteBorderColor="#2EDB17"
+    app:hint="*"
+    app:autoSize="true"
+    app:maxCountPerLine="8" />
 ```
 
-### **Step 2: Handle OTP Completion in Your Activity**
+### **Step 2: Initialize and Customize in Your Activity/Fragment**
 
-In your activity, listen for OTP completion and handle errors as needed.
+In your activity or fragment, you can access and customize the `OtpView` as follows:
 
 ```kotlin
 val otpView = findViewById<OtpView>(R.id.otp)
@@ -122,84 +105,298 @@ otpView.apply {
     setSquareCount(6)
     setOnCompleteListener { otp ->
         if (!checkOTP(otp)) {
-            onOtpError(true)
+            otpView.onOtpError(true)
         }
     }
-}
-
-fun checkOTP(otp: String): Boolean {
-    return otp == "123456"
 }
 ```
 
 ---
 
-## **Customization Attributes**
+## **Public Methods in OtpView**
 
-Here is a full list of customization attributes you can use with the `OtpView`:
-
-- **squareColor**: The background color of each OTP square.
-- **squareSize**: The size of each square.
-- **cornerRadius**: The corner radius of each square for rounded edges.
-- **squareCount**: The number of OTP digits (squares) to display.
-- **textSize**: The size of the text inside each square.
-- **autoProcess**: Automatically processes the OTP once the required number of digits is entered.
-- **borderWidth**: The width of the border around each square.
-- **borderColor**: The color of the border around each square.
-- **textColor**: The color of the text inside the squares.
-- **hint**: A placeholder or hint that appears in the square before the user enters the OTP.
-- **squareHeight**: The height of each square.
-- **squareWidth**: The width of each square.
-- **margins**: The margin between each OTP square.
-- **autoSize**: Automatically adjusts the size of the OTP squares to fit the available space.
-- **maxCountPerLine**: The maximum number of OTP squares per line.
-- **highlightColor**: The color of a square when it is focused or active.
-- **shape**: The shape of the OTP squares. Options: `"square"` (default) or `"circle"`.
-- **inputType**: Defines the input type for the OTP (e.g., `"number"` for numeric input).
-- **onCompleteBorderColor**: The border color when the OTP is successfully completed.
-- **onOTPErrorBorderColor**: The border color when the OTP is invalid.
-- **fontFamily**: The font family used for the text in the OTP squares.
-- **textStyle**: The text style (e.g., `"bold"`, `"italic"`, or `"normal"`).
+`OtpView` provides several public methods to customize the appearance and behavior of the OTP input view. Below are the descriptions and examples for each method.
 
 ---
 
-## **Implementation Details**
+### **`setSquareCount(int count)`**
 
-### **OTP View**
+**Description**:  
+Sets the number of OTP input fields (squares).
 
-`OtpView` is a custom view designed to handle OTP input in Android. The view consists of a series of squares, each representing a digit of the OTP. The view supports various customization options, such as square size, color, text size, border width, and more. It also features:
+**Parameters**:
+- `count`: The number of squares (e.g., 4 for a 4-digit OTP).
 
-- **Auto-Processing**: When the user finishes entering all OTP digits, the view can automatically trigger the completion event.
-- **Error Handling**: The view allows you to define custom behavior for when the OTP is completed or invalid, such as changing the border color.
-- **Flexible Layout**: You can define the number of squares (digits), square size, and text style directly from XML.
-
----
-
-## **Advantages of Using OTP View**
-
-- **Highly Customizable**: The library offers a wide range of options to control the appearance and behavior of the OTP input.
-- **Simple Integration**: Add the view to your XML layout and handle OTP logic in just a few lines of code.
-- **Error Handling**: It provides built-in error handling with customizable visual cues to guide the user.
-- **Modern UI Elements**: Leverages modern design principles to provide an intuitive and polished OTP input experience.
-- **Automatic Processing**: The OTP view can automatically process the OTP when all digits are entered, simplifying user interaction.
+**Usage**:
+```kotlin
+otpView.setSquareCount(6)
+```
 
 ---
 
-## **Contribution**
+### **`setSquareColor(int color)`**
 
-Contributions are welcome! If you encounter any bugs or have feature requests, feel free to open issues or submit pull requests.
+**Description**:  
+Sets the color of the OTP input fields (squares).
+
+**Parameters**:
+- `color`: The color (e.g., `Color.RED`, `#FF5733`).
+
+**Usage**:
+```kotlin
+otpView.setSquareColor(Color.parseColor("#871EA0FD"))
+```
+
+---
+
+### **`setSquareSize(float size)`**
+
+**Description**:  
+Sets the size of the OTP input squares.
+
+**Parameters**:
+- `size`: The size in pixels (e.g., 50f for 50px).
+
+**Usage**:
+```kotlin
+otpView.setSquareSize(50f)
+```
+
+---
+
+### **`setCornerRadius(float radius)`**
+
+**Description**:  
+Sets the corner radius for each OTP square.
+
+**Parameters**:
+- `radius`: The corner radius in pixels (e.g., 8f for 8px).
+
+**Usage**:
+```kotlin
+otpView.setCornerRadius(8f)
+```
+
+---
+
+### **`setTextSize(float size)`**
+
+**Description**:  
+Sets the text size inside the OTP squares.
+
+**Parameters**:
+- `size`: The text size in pixels (e.g., 16f).
+
+**Usage**:
+```kotlin
+otpView.setTextSize(16f)
+```
+
+---
+
+### **`setTextColor(int color)`**
+
+**Description**:  
+Sets the color of the text inside the OTP squares.
+
+**Parameters**:
+- `color`: The color for the text (e.g., `Color.BLACK`, `#835EFF`).
+
+**Usage**:
+```kotlin
+otpView.setTextColor(Color.parseColor("#835EFF"))
+```
+
+---
+
+### **`setHighlightColor(int color)`**
+
+**Description**:  
+Sets the color that will highlight the OTP input field while typing.
+
+**Parameters**:
+- `color`: The color for highlighting the input field (e.g., `#2A5CC1`).
+
+**Usage**:
+```kotlin
+otpView.setHighlightColor(Color.parseColor("#2A5CC1"))
+```
+
+---
+
+### **`setHint(String hint)`**
+
+**Description**:  
+Sets a hint for the OTP input fields (usually displayed when empty).
+
+**Parameters**:
+- `hint`: The hint string (e.g., "*").
+
+**Usage**:
+```kotlin
+otpView.setHint("*")
+```
+
+---
+
+### **`setOnCompleteListener(OnOTPCompleteListener listener)`**
+
+**Description**:  
+Sets a listener to be called when the OTP is completed.
+
+**Parameters**:
+- `listener`: The listener to handle the OTP completion.
+
+**Usage**:
+```kotlin
+otpView.setOnCompleteListener { otp ->
+    if (!checkOTP(otp)) {
+        otpView.onOtpError(true)
+    }
+}
+```
+
+---
+
+### **`onOtpError(boolean hasError)`**
+
+**Description**:  
+Indicates if there is an error with the OTP input (e.g., incorrect OTP).
+
+**Parameters**:
+- `hasError`: `true` for error, `false` otherwise.
+
+**Usage**:
+```kotlin
+otpView.onOtpError(true)
+```
+
+---
+
+### **`setAutoProcess(boolean autoProcess)`**
+
+**Description**:  
+Enables or disables auto-processing of the OTP once the user completes the input.
+
+**Parameters**:
+- `autoProcess`: `true` to enable auto-processing, `false` to disable.
+
+**Usage**:
+```kotlin
+otpView.setAutoProcess(true)
+```
+
+---
+
+### **`setInputType(String inputType)`**
+
+**Description**:  
+Sets the input type (e.g., numeric or text) for the OTP field.
+
+**Parameters**:
+- `inputType`: "number" or "text".
+
+**Usage**:
+```kotlin
+otpView.setInputType("number")
+```
+
+---
+
+### **`setBorderColor(int color)`**
+
+**Description**:  
+Sets the color of the border around the OTP input field.
+
+**Parameters**:
+- `color`: The color for the border (e.g., `Color.BLUE`, `#779AEB`).
+
+**Usage**:
+```kotlin
+otpView.setBorderColor(Color.parseColor("#779AEB"))
+```
+
+---
+
+### **`setBorderWidth(float width)`**
+
+**Description**:  
+Sets the width of the border around the OTP input squares.
+
+**Parameters**:
+- `width`: The border width (e.g., `2f` for 2px).
+
+**Usage**:
+```kotlin
+otpView.setBorderWidth(2f)
+```
+
+---
+
+### **`setSquareHeight(float height)`**
+
+**Description**:  
+Sets the height of the OTP input squares.
+
+**Parameters**:
+- `height`: The height in pixels (e.g., `50f` for 50px).
+
+**Usage**:
+```kotlin
+otpView.setSquareHeight(50f)
+```
+
+---
+
+### **`setSquareWidth(float width)`**
+
+**Description**:  
+Sets the width of the OTP input squares.
+
+**Parameters**:
+- `width`: The width in pixels (e.g., `50f` for 50px).
+
+**Usage**:
+```kotlin
+otpView.setSquareWidth(50f)
+```
+
+---
+
+### **`setMaxCountPerLine(int count)`**
+
+**Description**:  
+Sets the maximum number of OTP input squares per line.
+
+**Parameters**:
+- `count`: The number of squares to display per line.
+
+**Usage**:
+```kotlin
+otpView.setMaxCountPerLine(8)
+```
+
+---
+
+### **`setAutoSize(boolean autoSize)`**
+
+**Description**:  
+Enables or disables automatic resizing of the OTP input squares.
+
+**Parameters**:
+- `autoSize`: `true` to enable, `false` to disable.
+
+**Usage**:
+```
+
+kotlin
+otpView.setAutoSize(true)
+```
 
 ---
 
 ## **License**
 
-This project is licensed under the **MIT License**. See the `LICENSE` file for details.
-
----
-
-## **Notes**
-
-- Always ensure that the correct OTP validation logic is in place to secure the application.
-- The view works best when the `squareCount` attribute is set according to the expected OTP length.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---

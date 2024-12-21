@@ -22,9 +22,10 @@
         app:fontFamily="@font/dm_sans_medium"
         app:highlightColor="@color/black"
         app:hint="*"
+        app:textColor="#FA4F06"
         app:maxCountPerLine="6"
         app:onCompleteBorderColor="#2EDB17"
-        app:squareColor="#4DC4BAD1"
+        app:squareColor="#4DFDBA1E"
         app:squareCount="16"
         app:squareHeight="50dp"
         app:squareWidth="50dp" />

@@ -131,7 +131,7 @@ class OtpView @JvmOverloads constructor(
                         ).apply {
                             setMargins(margins, margins, margins, margins)
                         } else LayoutParams(
-                            squareWidth.toInt() - margins*2 - paddingLeft/(squareCount%maxCountPerLine),
+                            squareWidth.toInt() - margins * 2 - paddingLeft / (squareCount % maxCountPerLine),
                             resolveAvailableHeight().toInt()
                         ).apply {
                             setMargins(margins, margins, margins, margins)

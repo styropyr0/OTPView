@@ -16,7 +16,6 @@ import android.view.Gravity
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.matrix.otpview.interfaces.OTPCompletionHandler
-import kotlin.math.abs
 
 /**
  * Customizable OTP Edit Text
@@ -61,6 +60,9 @@ class OtpView @JvmOverloads constructor(
         strokeWidth = 5f
     }
 
+    /**
+     * A highly customizable OTP layout. Please refer the datasheet to learn about the features.
+     */
     init {
         context.theme.obtainStyledAttributes(
             attrs,
@@ -90,7 +92,7 @@ class OtpView @JvmOverloads constructor(
                 onOTPErrorBorderColor =
                     getColor(R.styleable.OtpView_onOTPErrorBorderColor, Color.RED)
                 inputType =
-                    if (getString(R.styleable.OtpView_inputType)?.lowercase() == "numeric") InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_NUMBER
+                    if (getString(R.styleable.OtpView_inputType)?.lowercase() == "number") InputType.TYPE_CLASS_NUMBER else InputType.TYPE_CLASS_TEXT
                 val shapeString = getString(R.styleable.OtpView_shape)?.lowercase() ?: "rectangle"
                 editTextShape = when (shapeString) {
                     "circle" -> Shape.CIRCLE
@@ -124,10 +126,10 @@ class OtpView @JvmOverloads constructor(
                 }
                 val editText = EditText(context).apply {
                     layoutParams =
-                        if (i < squareCount - squareCount % maxCountPerLine) LayoutParams(
+                        if (i < squareCount - squareCount % maxCountPerLine || i < maxCountPerLine) LayoutParams(
                             resolveAvailableWidth().toInt(),
                             resolveAvailableHeight().toInt(),
-                            1f
+                            0.2f
                         ).apply {
                             setMargins(margins, margins, margins, margins)
                         } else LayoutParams(
@@ -297,11 +299,19 @@ class OtpView @JvmOverloads constructor(
             }
     }
 
+    /**
+     * Set the input type of the OTP View. By default, the type is text.
+     * @param inputType The input type. Use the values from input type class.
+     */
     fun setInputType(inputType: Int) {
         this.inputType = inputType
         updateEditTextsTextSize()
     }
 
+    /**
+     * Set the number of squares in the OTP View.
+     * @param squareCount The number of characters in OTP.
+     */
     fun setSquareCount(squareCount: Int) {
         val previousCount = this.squareCount
         this.squareCount = squareCount
@@ -313,6 +323,10 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set autoSizing mode. The size of the squares will be adjusted irrespective of the hardcoded values, making sure that the squares fit in the given width.
+     * @param mode True to turn on autoSizing and false to turn it off.
+     */
     fun toggleAutoSizing(mode: Boolean) {
         if (autoSize != mode) {
             autoSize = mode
@@ -320,11 +334,20 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set the background color of the square.
+     * @param color The background color of square.
+     */
     fun setSquareColor(color: Int) {
         this.squareColor = color
         updateEditTextsBackground()
     }
 
+    /**
+     * Set the size of the square.
+     * It is assumed to be a square.
+     * @param size The size of the square.
+     */
     fun setSquareSize(size: Float) {
         if (this.squareSize != size) {
             this.squareSize = size
@@ -332,6 +355,10 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set the corner radius of the square.
+     * @param radius The corner radius
+     */
     fun setCornerRadius(radius: Float) {
         if (this.cornerRadius != radius) {
             this.cornerRadius = radius
@@ -339,6 +366,10 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set the text size of the OTP View.
+     * @param size The size of OTP Text.
+     */
     fun setTextSize(size: Float) {
         if (this.textSize != size) {
             this.textSize = size
@@ -346,6 +377,10 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set the border color of the square.
+     * @param color The border color
+     */
     fun setBorderColor(color: Int) {
         if (this.borderColor != color) {
             this.borderColor = color
@@ -353,12 +388,21 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set the border color of the square when the OTP is completely entered.
+     * @param color The border color
+     */
     fun setOnCompleteBorderColor(color: Int) {
         if (this.onCompleteBorderColor != color) {
             this.onCompleteBorderColor = color
         }
     }
 
+    /**
+     * Set the border color of the square when the OTP is entered wrong
+     * It is triggered when onOtpError is called.
+     * @param color The border color
+     */
     fun setOnOTPErrorBorderColor(color: Int) {
         if (this.onOTPErrorBorderColor != color) {
             this.onOTPErrorBorderColor = color
@@ -380,6 +424,10 @@ class OtpView @JvmOverloads constructor(
         borderColor = tempColor
     }
 
+    /**
+     * Sets the text color of the OTP.
+     * @param color Text color to be changed to.
+     */
     fun setTextColor(color: Int) {
         if (this.textColor != color) {
             this.textColor = color
@@ -387,6 +435,9 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * A listener for OTP. It is automatically executed when OTP is entered completely.
+     */
     fun setOnCompleteListener(listener: OTPCompletionHandler) {
         this.completionListener = listener
     }
@@ -403,6 +454,10 @@ class OtpView @JvmOverloads constructor(
         this.startAnimation(animation)
     }
 
+    /**
+     * Call this function to perform a shake animation with vibration to show that the entered otp is invalid.
+     * @param clearOtp Set this true to clear the OTP entered when this is called.
+     */
     fun onOtpError(clearOtp: Boolean = false) {
         updateOnCompleteBorderColor(onOTPErrorBorderColor)
         vibrate()

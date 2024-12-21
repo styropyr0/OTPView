@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
         }
         val otpView = findViewById<OtpView>(R.id.otp)
         otpView.apply {
-            setInputType(InputType.TYPE_CLASS_TEXT)
             setSquareCount(6)
             setOnCompleteListener { it ->
                 if (!checkOTP(it))

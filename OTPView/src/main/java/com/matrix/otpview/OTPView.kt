@@ -351,6 +351,14 @@ class OtpView @JvmOverloads constructor(
     }
 
     /**
+     * Set the background color of the square.
+     * @param color The background color of square.
+     */
+    override fun setBackgroundColor(color: Int){
+        setSquareColor(color)
+    }
+
+    /**
      * Set the size of the square.
      * It is assumed to be a square.
      * @param size The size of the square.

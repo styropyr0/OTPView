@@ -73,7 +73,9 @@ class OtpView @JvmOverloads constructor(
                 squareColor = getColor(R.styleable.OtpView_squareColor, Color.TRANSPARENT)
                 squareSize = getDimension(R.styleable.OtpView_squareSize, 50f)
                 cornerRadius = getDimension(R.styleable.OtpView_cornerRadius, 10f)
-                squareCount = getInt(R.styleable.OtpView_squareCount, 4)
+                squareCount = getInt(R.styleable.OtpView_squareCount, 4).let {
+                    if (it < 1) 4 else it
+                }
                 textSize = getFloat(R.styleable.OtpView_textSize, 18f)
                 autoProcess = getBoolean(R.styleable.OtpView_autoProcess, true)
                 borderWidth = getDimension(R.styleable.OtpView_borderWidth, 1f)
@@ -98,7 +100,9 @@ class OtpView @JvmOverloads constructor(
                     "circle" -> Shape.CIRCLE
                     else -> Shape.RECTANGLE
                 }
-                maxCountPerLine = getInt(R.styleable.OtpView_maxCountPerLine, 4)
+                maxCountPerLine = getInt(R.styleable.OtpView_maxCountPerLine, 4).let {
+                    if (it < 1) 4 else it
+                }
             } finally {
                 recycle()
             }

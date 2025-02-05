@@ -52,6 +52,7 @@ class OtpView @JvmOverloads constructor(
     private var fontFamily: String? = null
     private var textStyle: String? = null
     private var otp: String = ""
+    private var hintTextColor: Int = Color.GRAY
 
     private var completionListener: OTPCompletionHandler? = null
 
@@ -89,6 +90,7 @@ class OtpView @JvmOverloads constructor(
                 highlightColor = getColor(R.styleable.OtpView_highlightColor, Color.BLUE)
                 fontFamily = getString(R.styleable.OtpView_fontFamily)
                 textStyle = getString(R.styleable.OtpView_textStyle)
+                hintTextColor = getColor(R.styleable.OtpView_hintTextColor, Color.GRAY)
                 onCompleteBorderColor =
                     getColor(R.styleable.OtpView_onCompleteBorderColor, Color.GREEN)
                 onOTPErrorBorderColor =
@@ -148,6 +150,7 @@ class OtpView @JvmOverloads constructor(
                     background = createBackgroundDrawable()
                     inputType = this@OtpView.inputType
                     textSize = this@OtpView.textSize
+                    setHintTextColor(hintTextColor)
                     setTextColor(textColor)
                     if (!fontFamily.isNullOrEmpty()) setTypeface(
                         Typeface.create(

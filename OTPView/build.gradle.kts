@@ -48,7 +48,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.styropyr0"
                 artifactId = "styro-otpview"
-                version = "1.0.0"
+                version = "1.0.1"
             }
         }
     }

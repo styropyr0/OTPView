@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.text.Editable
@@ -223,20 +224,40 @@ class OtpView @JvmOverloads constructor(
     private fun resolveAvailableHeight() = if (squareHeight > 0f) squareHeight else squareSize
 
 
-    private fun createBackgroundDrawable(): GradientDrawable {
-        val drawable = GradientDrawable()
-        if (editTextShape == Shape.CIRCLE) {
-            drawable.shape = GradientDrawable.OVAL
-            drawable.setSize(squareSize.toInt(), squareSize.toInt())
-            drawable.setColor(squareColor)
-            drawable.setStroke(borderWidth.toInt(), borderColor)
-        } else {
-            drawable.shape = GradientDrawable.RECTANGLE
-            drawable.setColor(squareColor)
-            drawable.cornerRadius = cornerRadius
-            drawable.setStroke(borderWidth.toInt(), borderColor)
+    private fun createBackgroundDrawable(): StateListDrawable {
+        val nonFocusedDrawable = GradientDrawable().apply {
+            if (editTextShape == Shape.CIRCLE) {
+                shape = GradientDrawable.OVAL
+                setSize(squareSize.toInt(), squareSize.toInt())
+                setColor(squareColor)
+                setStroke(borderWidth.toInt(), borderColor)
+            } else {
+                shape = GradientDrawable.RECTANGLE
+                setColor(squareColor)
+                setStroke(borderWidth.toInt(), borderColor)
+            }
         }
-        return drawable
+
+        val focusedDrawable = GradientDrawable().apply {
+            if (editTextShape == Shape.CIRCLE) {
+                shape = GradientDrawable.OVAL
+                setColor(squareColor)
+                setSize(squareSize.toInt(), squareSize.toInt())
+                setStroke(borderWidth.toInt(), highlightColor)
+            } else {
+                shape = GradientDrawable.RECTANGLE
+                setColor(squareColor)
+                setStroke(borderWidth.toInt(), highlightColor)
+            }
+        }
+
+        nonFocusedDrawable.cornerRadius = cornerRadius
+        focusedDrawable.cornerRadius = cornerRadius
+
+        return StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_focused), focusedDrawable)
+            addState(intArrayOf(), nonFocusedDrawable)
+        }
     }
 
     private fun updateEditTextsLayout() {
@@ -509,8 +530,7 @@ class OtpView @JvmOverloads constructor(
         }
     }
 
-    inner class GenericTextWatcher(private val currentEditText: EditText, private val index: Int) :
-        TextWatcher {
+    inner class GenericTextWatcher(private val currentEditText: EditText, private val index: Int) : TextWatcher {
 
         override fun afterTextChanged(editable: Editable?) {
             val text = editable.toString()
@@ -518,13 +538,14 @@ class OtpView @JvmOverloads constructor(
             if (!text.isEmpty()) updateOtp(index, text[0])
             else clearOtp(index)
 
-            if (text.length == 1 && index < squareCount - 1) {
+            if (text.isNotEmpty() && index < squareCount - 1) {
                 val nextEditText = getNextEditText(index)
                 nextEditText?.requestFocus()
             } else if (text.isEmpty() && index > 0) {
                 val prevEditText = getPreviousEditText(index)
                 prevEditText?.requestFocus()
-            }
+            } else if (index == squareCount - 1)
+                getNextEditText(index - 1)?.clearFocus()
 
             if (isOtpComplete()) {
                 updateOnCompleteBorderColor(onCompleteBorderColor)

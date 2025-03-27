@@ -4,9 +4,11 @@
 
 **OtpView** is a customizable OTP (One Time Password) input view for Android. It allows users to enter OTPs in a secure, visually appealing way with full flexibility in terms of appearance and behavior. You can easily customize the number of input squares, square colors, text size, and many other aspects to fit your app's design.
 
-![Project Logo](./images/scr1.png)
-![Project Logo](./images/scr2.png)
-![Project Logo](./images/scr3.png)
+<div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./images/scr1.png" alt="Screenshot 1" width="200"/>
+    <img src="./images/scr2.png" alt="Screenshot 2" width="200"/>
+    <img src="./images/scr3.png" alt="Screenshot 3" width="200"/>
+</div>
 
 ---
 

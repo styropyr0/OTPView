@@ -22,5 +22,6 @@
         <attr name="onOTPErrorBorderColor" format="color" />
         <attr name="fontFamily" format="string" />
         <attr name="textStyle" format="string"/>
+        <attr name="hintTextColor" format="color"/>
     </declare-styleable>
 </resources>

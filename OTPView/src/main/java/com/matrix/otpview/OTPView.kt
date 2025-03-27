@@ -197,6 +197,7 @@ class OtpView @JvmOverloads constructor(
                         )
                     )
                     textSize = this@OtpView.textSize
+                    setHintTextColor(hintTextColor)
                     setTextColor(textColor)
                     hint = this@OtpView.hint
                     filters = arrayOf(InputFilter.LengthFilter(1))

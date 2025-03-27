@@ -14,6 +14,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.KeyEvent
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.matrix.otpview.interfaces.OTPCompletionHandler
@@ -532,6 +533,23 @@ class OtpView @JvmOverloads constructor(
     }
 
     inner class GenericTextWatcher(private val currentEditText: EditText, private val index: Int) : TextWatcher {
+        var backCount = 0
+
+        init {
+            currentEditText.setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_DEL && event.action == KeyEvent.ACTION_DOWN) {
+                    if (currentEditText.text.isEmpty()) backCount = 2
+                    else backCount++
+                    if (currentEditText.text.isEmpty() && index > 0 && backCount > 1) {
+                        val prevEditText = getPreviousEditText(index)
+                        prevEditText?.requestFocus()
+                        backCount = 0
+                        return@setOnKeyListener true
+                    }
+                }
+                false
+            }
+        }
 
         override fun afterTextChanged(editable: Editable?) {
             val text = editable.toString()
@@ -542,9 +560,6 @@ class OtpView @JvmOverloads constructor(
             if (text.isNotEmpty() && index < squareCount - 1) {
                 val nextEditText = getNextEditText(index)
                 nextEditText?.requestFocus()
-            } else if (text.isEmpty() && index > 0) {
-                val prevEditText = getPreviousEditText(index)
-                prevEditText?.requestFocus()
             } else if (index == squareCount - 1)
                 getNextEditText(index - 1)?.clearFocus()
 

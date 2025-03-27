@@ -4,6 +4,10 @@
 
 **OtpView** is a customizable OTP (One Time Password) input view for Android. It allows users to enter OTPs in a secure, visually appealing way with full flexibility in terms of appearance and behavior. You can easily customize the number of input squares, square colors, text size, and many other aspects to fit your app's design.
 
+![Project Logo](./images/scr1.png)
+![Project Logo](./images/scr2.png)
+![Project Logo](./images/scr3.png)
+
 ---
 
 ## **Why Use OtpView?**
@@ -78,21 +82,30 @@ dependencyResolutionManagement {
 To add the `OtpView` to your layout file, use the following XML code:
 
 ```xml
-<com.matrix.otpview.OtpView
-    android:id="@+id/otp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:squareCount="6"
-    app:squareColor="#871EA0FD"
-    app:squareSize="50dp"
-    app:cornerRadius="8dp"
-    app:textSize="16sp"
-    app:textColor="#835EFF"
-    app:highlightColor="#2A5CC1"
-    app:onCompleteBorderColor="#2EDB17"
-    app:hint="*"
-    app:autoSize="true"
-    app:maxCountPerLine="8" />
+    <com.matrix.otpview.OtpView
+        android:id="@+id/otp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="25dp"
+        android:gravity="center"
+        app:autoSize="false"
+        app:borderColor="#F21767"
+        app:borderWidth="2dp"
+        app:cornerRadius="18dp"
+        app:shape="rectangle"
+        app:inputType="number"
+        app:fontFamily="@font/dm_sans_medium"
+        app:highlightColor="#5B04E0"
+        app:hintTextColor="@color/white"
+        app:hint="*"
+        app:textStyle="bold"
+        app:maxCountPerLine="6"
+        app:textColor="#D10F2C"
+        app:onCompleteBorderColor="#2EDB17"
+        app:squareColor="#B1EF7AB6"
+        app:squareCount="4"
+        app:squareHeight="55dp"
+        app:squareWidth="55dp" />
 ```
 
 ### **Step 2: Initialize and Customize in Your Activity/Fragment**

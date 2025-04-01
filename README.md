@@ -12,26 +12,7 @@
 
 ---
 
-## **Why Use OtpView?**
 
-### **Key Features**:
-
-1. **Customizable UI**:  
-   With multiple customization options like square size, color, and border radius, you can fully adapt the OTP view to your app's design.
-
-2. **Auto-Processing**:  
-   Supports automatic OTP processing once the user completes the input, saving you time and providing a smoother user experience.
-
-3. **Error Handling**:  
-   Handle errors gracefully by highlighting fields with incorrect OTP entries, helping users quickly correct mistakes.
-
-4. **Multi-Line Input**:  
-   Supports a flexible number of input fields and automatic line breaks for a clean layout.
-
-5. **Enhanced Security**:  
-   The OTP input is designed to be secure, with options to handle both numeric and text-based inputs.
-
----
 
 ## **Installation**
 
